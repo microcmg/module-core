@@ -33,6 +33,10 @@ class Application {
 	public $layoutsPath;
 	public $templatesPath;
 
+	// Uploads
+	public $uploadsUrl;
+	public $uploadsPath;
+
 	// Site
 	public $siteName;
 
