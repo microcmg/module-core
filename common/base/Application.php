@@ -3,61 +3,59 @@ namespace cmsgears\core\common\base;
 
 use cmsgears\core\common\utilities\FileUtility;
 
+/**
+ * The base application.
+ */
 class Application {
 
-	// Host and scheme
-	public $hostname;
-	public $protocol;
+	// Type - web(default, backend, frontend, rest), others(console)
+	public $type = 'default';
 
-	// Site & Page Url
+	// Site Url
 	public $siteUrl;
-	public $pageUrl;
 
-	// Base Url
-	public $baseUrl;
+	// Request URI
+	public $uri;
 
 	// Base Route
 	public $baseRoute;
 
-	// Base Path - Used to refer local files
+	// Base Path
 	public $basePath;
+
+	// Includes Path
 	public $includesPath;
 
-	// Resource URL & Path - Used to refer the resources
-	public $resourcesUrl;
+	// Resource & Assets Path
 	public $resourcesPath;
-	public $assetsUrl;
 	public $assetsPath;
 
-	// Layouts & Templates
+	// Sub Includes - Layouts, Templates, Components, Headers, Footers, and Sidebars
 	public $layoutsPath;
 	public $templatesPath;
+	public $componentsPath;
+	public $headersPath;
+	public $footersPath;
+	public $sidebarsPath;
 
-	// Uploads
-	public $uploadsUrl;
+	// Uploads Path
 	public $uploadsPath;
 
 	// Site
 	public $siteName;
 
-	// Assets
+	// Assets Version
 	public $assetsVersion;
-
-	// SEO
-	public $title;
-	public $desc;
-	public $keywords;
-	public $robots;
-	public $metas = [];
 
 	// Page
 	public $page;
 
+	// MVC
+	public $controller;
+
 	public function __construct() {
 
-		// Host and scheme
-		$this->hostname	= $_SERVER[ 'HTTP_HOST' ];
-		$this->protocol	= isset( $_SERVER[ 'HTTPS' ] ) ? 'https' : 'http';
+		// The base contructor
 	}
 
 	public function init() {
@@ -66,19 +64,12 @@ class Application {
 	}
 
 	/**
-	 * Initialize the router to identify the request URL and the corresponding page.
+	 * Initialize the router to identify the corresponding page.
 	 */
 	public function initRouter() {
 
-		// Router
-		$uri = $_SERVER[ 'REQUEST_URI' ];
-
-		// Clean base route
-		$uri = str_replace( $this->baseRoute, '', $uri );
-		$uri = preg_split( '/\?/', $uri );
-
-		// Clean slashes
-		$route = trim( $uri[ 0 ], '/' );
+		// Request Route
+		$route = $this->generateRoute();
 
 		$this->page = empty( $route ) ? "{$this->basePath}/pages/index.php" : "{$this->basePath}/pages/{$route}.php";
 
@@ -100,7 +91,7 @@ class Application {
 	 */
 	public function renderPage() {
 
-		$app = $this;
+		$app = $this; // Passed as variable to the page
 
 		if( file_exists( $this->page ) ) {
 
@@ -110,6 +101,21 @@ class Application {
 
 			echo "Page not found.";
 		}
+	}
+
+	/**
+	 * Generates the Route from the given URI.
+	 */
+	protected function generateRoute() {
+
+		// Clean base route
+		$this->uri = str_replace( $this->baseRoute, '', $this->uri );
+		$this->uri = preg_split( '/\?/', $this->uri );
+
+		// Clean slashes
+		$route = trim( $this->uri[ 0 ], '/' );
+
+		return $route;
 	}
 
 }
